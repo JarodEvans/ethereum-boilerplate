@@ -72,7 +72,7 @@ const App = ({ isServerInfo }) => {
               width: "100%",
               justifyContent: "center",
             }}
-            defaultSelectedKeys={["quickstart"]}
+            defaultSelectedKeys={["nft"]}
           >
             <Menu.Item key="nftMarket">
               <NavLink to="/nftMarket">Explore</NavLink>
