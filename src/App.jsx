@@ -14,7 +14,6 @@ import { Menu, Layout } from "antd";
 import "antd/dist/antd.css";
 import NativeBalance from "components/NativeBalance";
 import "./style.css";
-import Contract from "components/Contract/Contract";
 import Text from "antd/lib/typography/Text";
 const { Header, Footer } = Layout;
 
