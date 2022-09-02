@@ -10,6 +10,7 @@ import {
 import Account from "components/Account";
 import Chains from "components/Chains";
 import NFTBalance from "components/NFTBalance";
+import NFTTokenIds from "components/NFTTokenIds";
 import { Menu, Layout } from "antd";
 import "antd/dist/antd.css";
 import NativeBalance from "components/NativeBalance";
@@ -95,7 +96,7 @@ const App = ({ isServerInfo }) => {
               <NFTBalance />
             </Route>
             <Route path="/nftMarket">
-              <NFTBalance />
+              <NFTTokenIds />
             </Route>
             <Route path="/transactions">
               <NFTBalance />
