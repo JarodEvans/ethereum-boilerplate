@@ -67,7 +67,7 @@ function NFTTokenIds({inputValue}) {
   return (
     <>
       <div style={styles.NFTs}>
-        {NFTTokenIds &&
+        {NFTTokenIds && inputValue !== "explore" &&
           NFTTokenIds.map((nft, index) => (
             <Card
               hoverable

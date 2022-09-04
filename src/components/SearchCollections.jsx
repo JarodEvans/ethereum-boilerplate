@@ -3,11 +3,14 @@ import { useMoralisDapp } from "providers/MoralisDappProvider/MoralisDappProvide
 import { getCollectionsByChain } from "helpers/collections";
 import { useMoralis } from "react-moralis";
 
-function SearchCollections(){
+function SearchCollections({setInputValue}){
     const {Option} = Select;
     const {chainId} = useMoralisDapp();
     const NFTCollections = getCollectionsByChain(chainId);
 
+    function onChange(value){
+        setInputValue(value);
+    }
     return(
         <>
             <Select
@@ -18,6 +21,7 @@ function SearchCollections(){
                 }}
                 placeholder="Find a collection"
                 optionFilterProps="children"
+                onChange={onChange}
             >
                 {NFTCollections &&
                     NFTCollections.map((collection, i) =>
