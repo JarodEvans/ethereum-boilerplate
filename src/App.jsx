@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMoralis } from "react-moralis";
 import {
   BrowserRouter as Router,
@@ -11,6 +11,7 @@ import Account from "components/Account";
 import Chains from "components/Chains";
 import NFTBalance from "components/NFTBalance";
 import NFTTokenIds from "components/NFTTokenIds";
+import SearchCollections from "components/SearchCollections";
 import { Menu, Layout } from "antd";
 import "antd/dist/antd.css";
 import NativeBalance from "components/NativeBalance";
@@ -52,6 +53,8 @@ const App = ({ isServerInfo }) => {
   const { isWeb3Enabled, enableWeb3, isAuthenticated, isWeb3EnableLoading } =
     useMoralis();
 
+  const [inputValue, setInputValue] = useState("0x1A92f7381B9F03921564a437210bB9396471050C");
+
   useEffect(() => {
     if (isAuthenticated && !isWeb3Enabled && !isWeb3EnableLoading) enableWeb3();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,6 +65,7 @@ const App = ({ isServerInfo }) => {
       <Router>
         <Header style={styles.header}>
           <Logo />
+          <SearchCollections />
           <Menu
             theme="light"
             mode="horizontal"
@@ -96,7 +100,7 @@ const App = ({ isServerInfo }) => {
               <NFTBalance />
             </Route>
             <Route path="/nftMarket">
-              <NFTTokenIds />
+              <NFTTokenIds inputValue={inputValue}/>
             </Route>
             <Route path="/transactions">
               <NFTBalance />

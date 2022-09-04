@@ -20,8 +20,8 @@ const styles = {
   },
 };
 
-function NFTTokenIds() {
-  const { NFTTokenIds } = useNFTTokenIds();
+function NFTTokenIds({inputValue}) {
+  const { NFTTokenIds } = useNFTTokenIds(inputValue);
   const { chainId } = useMoralisDapp();
   const { Moralis } = useMoralis();
   const [visible, setVisibility] = useState(false);
