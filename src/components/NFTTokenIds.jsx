@@ -58,8 +58,8 @@ function NFTTokenIds({inputValue, setInputValue}) {
       });
   }
 
-  const handleTransferClick = (nft) => {
-    setNftToSend(nft);
+  const handleBuyClick = (nft) => {
+    setNftToBuy(nft);
     setVisibility(true);
   };
 
@@ -83,8 +83,8 @@ function NFTTokenIds({inputValue, setInputValue}) {
                     }
                   />
                 </Tooltip>,
-                <Tooltip title="List This NFT">
-                  <ShoppingCartOutlined onClick={() => alert("Add Marketplace smartcontract integrations")} />
+                <Tooltip title="Buy This NFT">
+                  <ShoppingCartOutlined onClick={() => handleBuyClick(nft)} />
                 </Tooltip>,
               ]}
               style={{ width: 240, border: "2px solid #e7eaf3" }}
@@ -108,7 +108,7 @@ function NFTTokenIds({inputValue, setInputValue}) {
             <Card
               hoverable
               actions={[
-                <Tooltip title="List This NFT">
+                <Tooltip title="Buy This NFT">
                   <RightCircleOutlined onClick={() => setInputValue(nft.addrs)} />
                 </Tooltip>,
               ]}
@@ -129,17 +129,21 @@ function NFTTokenIds({inputValue, setInputValue}) {
           ))}
       </div>
       <Modal
-        title={`Transfer ${nftToSend?.name || "NFT"}`}
+        title={`Buy ${nftToBuy?.name || "NFT"}`}
         visible={visible}
         onCancel={() => setVisibility(false)}
-        onOk={() => transfer(nftToSend, amountToSend, receiverToSend)}
-        confirmLoading={isPending}
-        okText="Send"
+        onOk={() => alert("bought this nft")}
+        okText="Buy"
       >
-        <AddressInput autoFocus placeholder="Receiver" onChange={setReceiver} />
-        {nftToSend && nftToSend.contract_type === "erc1155" && (
-          <Input placeholder="amount to send" onChange={(e) => handleChange(e)} />
-        )}
+      <img 
+      src={nftToBuy?.image}
+      style={{
+        width:"250px",
+        margin: "auto",
+        borderRadius: "10px",
+        marginBottom: "15px",
+      }}
+      />
       </Modal>
     </>
   );
