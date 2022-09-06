@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { useMoralis } from "react-moralis";
-import { Card, Image, Tooltip, Modal, Input } from "antd";
+import { useMoralis, useMoralisQuery } from "react-moralis";
+import { getNativeByChain } from "helpers/networks";
+import { Card, Image, Tooltip, Modal, Badge } from "antd";
 import { useNFTTokenIds } from "hooks/useNFTTokenIds";
 import { FileSearchOutlined, RightCircleOutlined, SendOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { useMoralisDapp } from "providers/MoralisDappProvider/MoralisDappProvider";
 import { getExplorer } from "helpers/networks";
+import { Alert } from "antd";
 import AddressInput from "./AddressInput";
 import { getCollectionsByChain } from "helpers/collections";
 const { Meta } = Card;
@@ -21,7 +23,7 @@ const styles = {
   },
 };
 
-function NFTTokenIds({inputValue, setInputValue}) {
+function NFTTokenIds({ inputValue, setInputValue }) {
   const { NFTTokenIds } = useNFTTokenIds(inputValue);
   const { chainId } = useMoralisDapp();
   const { Moralis } = useMoralis();
@@ -30,9 +32,24 @@ function NFTTokenIds({inputValue, setInputValue}) {
   const [amountToSend, setAmount] = useState(null);
   const [nftToSend, setNftToSend] = useState(null);
   const [isPending, setIsPending] = useState(false);
+  const nativeName = getNativeByChain(chainId);
   const NFTCollections = getCollectionsByChain(chainId);
   const [nftToBuy, setNftToBuy] = useState();
-
+  const queryMarketItems = useMoralisQuery("CreateMarketItems");
+  const fetchMarketItems = JSON.parse(
+    JSON.stringify(queryMarketItems.data, [
+      "objectId",
+      "createdAt",
+      "price",
+      "nftContract",
+      "itemId",
+      "sold",
+      "tokenId",
+      "seller",
+      "owner",
+      "confirmed"
+    ])
+  );
 
   async function transfer(nft, amount, receiver) {
     const options = {
@@ -63,9 +80,16 @@ function NFTTokenIds({inputValue, setInputValue}) {
     setVisibility(true);
   };
 
-  const handleChange = (e) => {
-    setAmount(e.target.value);
-  };
+  const getMarketItem = (nft) => {
+    const result = fetchMarketItems?.find(
+      (e) =>
+        e.nftContract === nft?.token_address &&
+        e.tokenId === nft?.token_id &&
+        e.sold === false &&
+        e.confirmed === true
+    )
+    return result
+  }
 
   console.log(NFTTokenIds);
   return (
@@ -99,7 +123,8 @@ function NFTTokenIds({inputValue, setInputValue}) {
               }
               key={index}
             >
-              <Meta title={nft.name} description={nft.token_address} />
+              {getMarketItem(nft) && <Badge.Ribbon text="Buy Now" color="green"></Badge.Ribbon>}
+              <Meta title={nft.name} description={nft.token_id} />
             </Card>
           ))}
 
@@ -128,23 +153,57 @@ function NFTTokenIds({inputValue, setInputValue}) {
             </Card>
           ))}
       </div>
-      <Modal
-        title={`Buy ${nftToBuy?.name || "NFT"}`}
-        visible={visible}
-        onCancel={() => setVisibility(false)}
-        onOk={() => alert("bought this nft")}
-        okText="Buy"
-      >
-      <img 
-      src={nftToBuy?.image}
-      style={{
-        width:"250px",
-        margin: "auto",
-        borderRadius: "10px",
-        marginBottom: "15px",
-      }}
-      />
-      </Modal>
+      {getMarketItem(nftToBuy) ? (
+        <Modal
+          title={`Buy ${nftToBuy?.name || "NFT"}`}
+          visible={visible}
+          onCancel={() => setVisibility(false)}
+          onOk={() => setVisibility(false)}
+          okText="Buy"
+        >
+          <div style={{
+            width: "250px",
+            margin: "auto",
+          }}>
+            <Badge.Ribbon text={`${getMarketItem(nftToBuy).price / ("1e" + 18)} ${nativeName}`} color="green">
+              <img
+                src={nftToBuy?.image}
+                style={{
+                  width: "250px",
+                  margin: "auto",
+                  borderRadius: "10px",
+                  marginBottom: "15px",
+                }}
+              />
+            </Badge.Ribbon>
+          </div>
+        </Modal>
+
+      ) : (
+        <Modal
+          title={`Buy ${nftToBuy?.name || "NFT"}`}
+          visible={visible}
+          onCancel={() => setVisibility(false)}
+          onOk={() => setVisibility(false)}
+          okText="Buy"
+        >
+          <img
+            src={nftToBuy?.image}
+            style={{
+              width: "250px",
+              margin: "auto",
+              borderRadius: "10px",
+              marginBottom: "15px",
+            }}
+          />
+            <Alert
+              message="This NFT is currently not for sale"
+              type="warning"
+            />
+        </Modal>
+      )
+      }
+
     </>
   );
 }
