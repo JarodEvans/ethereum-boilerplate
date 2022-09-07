@@ -36,7 +36,7 @@ function NFTBalance() {
     const p = currentPrice * ("1e" + 18);
     console.log("This is nft object: " + nft);
     const ops = {
-      contractAddress: marketAddress,
+      contractAddress: '0xCA3036F1c44f62bdeE496264bB2205e0caBE3142',
       functionName: listItemFunction,
       abi: contractABIJson,
       params : {

@@ -56,7 +56,7 @@ function NFTTokenIds({ inputValue, setInputValue }) {
     const itemID = tokenDetails.itemId;
     const tokenPrice = tokenDetails.price;
     const ops = {
-      contractAddress: marketAddress,
+      contractAddress: '0xCA3036F1c44f62bdeE496264bB2205e0caBE3142',
       functionName: purchaseItemFunction,
       abi: contractABIJson,
       params: {
@@ -86,7 +86,7 @@ function NFTTokenIds({ inputValue, setInputValue }) {
 
   async function updateSoldMarketItem(){
     const id = getMarketItem(nftToBuy).objectId
-    const marketList = Moralis.Object.extend("CreateMarketItem");
+    const marketList = Moralis.Object.extend("CreatedMarketItems");
     const query = new Moralis.Query(marketList);
     await query.get(id)
     .then(obj => {
