@@ -64,6 +64,12 @@ export const networkCollections = {
           name: "Pixel Show",
           addrs: "0xCA34404dD8Bd6537BE76F3A51B379F8949bD7973",
         },
+        {
+          image:
+            "https://img.nftically.com/testnets-assets/assets/f88bcfd7-f673-4a36-8af3-81e1f2caae70/a46c3bc06dde41178618238a42dbf1d8/play.png?tr=n-item_page_preview,q-80",
+          name: "New Test",
+          addrs: "0x6C7b357A492477410D136CEBaB5880cdF904d8c9",
+        },
       ],
   };
   

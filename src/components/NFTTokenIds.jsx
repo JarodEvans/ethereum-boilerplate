@@ -9,6 +9,7 @@ import { getExplorer } from "helpers/networks";
 import { Alert } from "antd";
 import AddressInput from "./AddressInput";
 import { getCollectionsByChain } from "helpers/collections";
+import { useWeb3ExecuteFunction } from "react-moralis";
 const { Meta } = Card;
 
 const styles = {
@@ -25,17 +26,16 @@ const styles = {
 
 function NFTTokenIds({ inputValue, setInputValue }) {
   const { NFTTokenIds } = useNFTTokenIds(inputValue);
-  const { chainId } = useMoralisDapp();
+  const { chainId, contractABI, marketAddress, walletAddress } = useMoralisDapp();
   const { Moralis } = useMoralis();
   const [visible, setVisibility] = useState(false);
-  const [receiverToSend, setReceiver] = useState(null);
-  const [amountToSend, setAmount] = useState(null);
-  const [nftToSend, setNftToSend] = useState(null);
-  const [isPending, setIsPending] = useState(false);
   const nativeName = getNativeByChain(chainId);
+  const contractProcessor = useWeb3ExecuteFunction();
+  const purchaseItemFunction = "createMarketSale";
+  const contractABIJson = JSON.parse(contractABI);
   const NFTCollections = getCollectionsByChain(chainId);
   const [nftToBuy, setNftToBuy] = useState();
-  const queryMarketItems = useMoralisQuery("CreateMarketItems");
+  const queryMarketItems = useMoralisQuery("CreatedMarketItems");
   const fetchMarketItems = JSON.parse(
     JSON.stringify(queryMarketItems.data, [
       "objectId",
@@ -51,34 +51,50 @@ function NFTTokenIds({ inputValue, setInputValue }) {
     ])
   );
 
-  async function transfer(nft, amount, receiver) {
-    const options = {
-      type: nft.contract_type,
-      tokenId: nft.token_id,
-      receiver: receiver,
-      contractAddress: nft.token_address,
+  async function purchase(){
+    const tokenDetails = getMarketItem(nftToBuy);
+    const itemID = tokenDetails.itemId;
+    const tokenPrice = tokenDetails.price;
+    const ops = {
+      contractAddress: marketAddress,
+      functionName: purchaseItemFunction,
+      abi: contractABIJson,
+      params: {
+        nftContract: nftToBuy.token_address,
+        itemId: itemID
+      },
+      msgValue: tokenPrice
     };
-
-    if (options.type === "erc1155") {
-      options.amount = amount;
-    }
-
-    setIsPending(true);
-    await Moralis.transfer(options)
-      .then((tx) => {
-        console.log(tx);
-        setIsPending(false);
-      })
-      .catch((e) => {
-        alert(e.message);
-        setIsPending(false);
-      });
+    await contractProcessor.fetch({
+      params: ops,
+      onSuccess: () => {
+        alert("Bought This NFT");
+        updateSoldMarketItem();
+      },
+      onError: (error) => {
+        alert(error); 
+      }
+    })
   }
+
+  
 
   const handleBuyClick = (nft) => {
     setNftToBuy(nft);
     setVisibility(true);
   };
+
+  async function updateSoldMarketItem(){
+    const id = getMarketItem(nftToBuy).objectId
+    const marketList = Moralis.Object.extend("CreateMarketItem");
+    const query = new Moralis.Query(marketList);
+    await query.get(id)
+    .then(obj => {
+      obj.set("sold", true);
+      obj.set("owner", walletAddress);
+      obj.save();
+    });
+  }
 
   const getMarketItem = (nft) => {
     const result = fetchMarketItems?.find(
@@ -124,7 +140,7 @@ function NFTTokenIds({ inputValue, setInputValue }) {
               key={index}
             >
               {getMarketItem(nft) && <Badge.Ribbon text="Buy Now" color="green"></Badge.Ribbon>}
-              <Meta title={nft.name} description={nft.token_id} />
+              <Meta title={nft.name} description={`#${nft.token_id}`} />
             </Card>
           ))}
 
@@ -158,7 +174,7 @@ function NFTTokenIds({ inputValue, setInputValue }) {
           title={`Buy ${nftToBuy?.name || "NFT"}`}
           visible={visible}
           onCancel={() => setVisibility(false)}
-          onOk={() => setVisibility(false)}
+          onOk={() => purchase()}
           okText="Buy"
         >
           <div style={{
@@ -185,7 +201,7 @@ function NFTTokenIds({ inputValue, setInputValue }) {
           visible={visible}
           onCancel={() => setVisibility(false)}
           onOk={() => setVisibility(false)}
-          okText="Buy"
+          okText="OK"
         >
           <img
             src={nftToBuy?.image}
