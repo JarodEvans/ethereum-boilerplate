@@ -56,7 +56,7 @@ function NFTTokenIds({ inputValue, setInputValue }) {
     const itemID = tokenDetails.itemId;
     const tokenPrice = tokenDetails.price;
     const ops = {
-      contractAddress: '0xCA3036F1c44f62bdeE496264bB2205e0caBE3142',
+      contractAddress: marketAddress,
       functionName: purchaseItemFunction,
       abi: contractABIJson,
       params: {

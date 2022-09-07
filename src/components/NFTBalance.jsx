@@ -36,7 +36,7 @@ function NFTBalance() {
     const p = currentPrice * ("1e" + 18);
     console.log("This is nft object: " + nft);
     const ops = {
-      contractAddress: '0xCA3036F1c44f62bdeE496264bB2205e0caBE3142',
+      contractAddress: marketAddress,
       functionName: listItemFunction,
       abi: contractABIJson,
       params : {
@@ -50,17 +50,30 @@ function NFTBalance() {
       params: ops,
       onSuccess: () => {
         alert("Item Listed.")
+        addItemImage();
       },
       onError: (error) => {
         alert("Something went wrong." + error)
       }
     })
-  }
+  };
 
   const handleSellClick = (nft) => {
     setNftToSell(nft);
     setVisibility(true);
   };
+
+  function addItemImage(){
+    const ItemImage = Moralis.Object.extend("ItemImages");
+    const itemImage = new ItemImage();
+
+    itemImage.set("image", nftToSell.image);
+    itemImage.set("nftContract", nftToSell.token_address);
+    itemImage.set("tokenId", nftToSell.token_id);
+    itemImage.set("name", nftToSell.name);
+
+    itemImage.save();
+  }
 
   console.log(NFTBalance);
   return (
